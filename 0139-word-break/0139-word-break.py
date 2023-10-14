@@ -1,18 +1,24 @@
-class Solution:
-    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
-        def construct(current, wordDict, memo = {}):
-            if current in memo:
-                return memo[current]
-            if not current:
-                return True
+"""
+We'll define a boolean array dp of length n+1, where n is the length of the input string s. dp[i] will be true if the substring s[0:i] can be segmented into space-separated sequences of words from the wordDict.
 
-            for word in wordDict:
-                if current.startswith(word):
-                    new_current = current[len(word):]
-                    if construct(new_current, wordDict, memo):
-                        memo[current] = True
-                        return True
-            memo[current] = False
-            return False
+The idea is to iterate through the string s and check if any substring ending at index i can be formed using words from the wordDict. To do this, we'll check if there is any index j such that dp[j] is true (meaning s[0:j] can be segmented) and the substring s[j:i] (s[j:i] is the substring from index j to i-1) is present in the wordDict.
+"""
+# Time complexity O(n^2)
+# Space complexity O(n)
+class Solution(object):
+    def wordBreak(self, s, wordDict):
+        """
+        :type s: str
+        :type wordDict: List[str]
+        :rtype: bool
+        """
+        n= len(s)
+        dp= [False] * (n+1)
+        dp[0]= True
 
-        return construct(s, wordDict)
+        for i in range(1,n+1):
+            for j in range(i):
+                if dp[j] and s[j:i] in wordDict:
+                    dp[i]=True
+                    break
+        return dp[n]
