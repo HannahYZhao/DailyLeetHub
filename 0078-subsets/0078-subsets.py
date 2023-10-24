@@ -1,34 +1,22 @@
-class Solution(object):
-    def subsets(self, nums):
-        """
-        :type nums: List[int]
-        :rtype: List[List[int]]
-        """
-        ret = []
-        self.dfs(nums, [], ret)
-        return ret
+# Time Complexity: O(2^n) - There are 2^n possible subsets for n elements.
+# Space Complexity; O(n) - At most, the depth of the recursion is n, and 'twos' holds a maximum of n elements at any given time.
+class Solution:
+    def subsets(self, nums: List[int]) -> List[List[int]]:
+        result = []
+        twos = []
 
-    def dfs(self, nums, path, ret):
-        ret.append(path)
-        for i in range(len(nums)):
-            self.dfs(nums[i+1:], path+[nums[i]], ret)
+        def helper_method(start):
+            result.append(twos[:])
 
-    # Bit Manipulation
-    def subsets2(self, nums):
-        res = []
-        nums.sort()
-        for i in xrange(1<<len(nums)):
-            tmp = []
-            for j in xrange(len(nums)):
-                if i & 1 << j:
-                    tmp.append(nums[j])
-            res.append(tmp)
-        return res
-    
-    # Iteratively
-    def subsets(self, nums):
-        res = [[]]
-        for num in sorted(nums):
-            res += [item+[num] for item in res]
-        return res
+            for i in range(start, len(nums)):
+                if nums[i] not in twos:
+                    twos.append(nums[i])
+                    helper_method(i + 1)
+                    twos.pop()
+
+        helper_method(0)
+        return result
+
+
+
         
