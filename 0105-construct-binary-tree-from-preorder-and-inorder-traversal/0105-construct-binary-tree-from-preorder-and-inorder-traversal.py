@@ -1,25 +1,46 @@
 # Definition for a binary tree node.
-# class TreeNode(object):
+# class TreeNode:
 #     def __init__(self, val=0, left=None, right=None):
 #         self.val = val
 #         self.left = left
 #         self.right = right
 
-# A preorder traversal is [node, left, right] while an inorder traversal is [left, node, right]
-class Solution(object):
-    def buildTree(self, preorder, inorder):
-        """
-        :type preorder: List[int]
-        :type inorder: List[int]
-        :rtype: TreeNode
-        """
-        if inorder:
-            # Let the index of preorder[0] in inorder be INDEX
-            INDEX = inorder.index(preorder.pop(0))
-            # Recursivly create left subtree by passing -> preorder with first element removed and the part of inorder array that lies to the left of INDEX. ->inorder[:INDEX]
-            root = TreeNode(inorder[INDEX])
-            root.left = self.buildTree(preorder, inorder[:INDEX])
-            # Recursivly create right subtree by passing -> the part of inorder array that lies to the right of INDEX. ->inorder[:INDEX]
-            root.right = self.buildTree(preorder, inorder[INDEX+1 :])
+# Time complexity: O(n)
+# Space complexity: O(n)
+class Solution:
+    p = []
+    def subtree(self, left, right):
+        root = TreeNode(self.p.pop(0))  # Determining root
 
-            return root
+        if len(left) > 1:               # Dividing left subtree further
+            r = self.p[0]
+            pos = left.index(r)
+            l = left[ :pos]
+            r = left[pos+1: ]
+            root.left = self.subtree(l, r)
+        elif len(left) == 1:
+            self.p.remove(left[0])
+            root.left = TreeNode(left[0])
+
+        if len(right) > 1:              # Dividing right subtree further
+            r = self.p[0]
+            pos = right.index(r)
+            l = right[ :pos]
+            r = right[pos+1: ]
+            root.right = self.subtree(l, r)
+        elif len(right) == 1:
+            self.p.remove(right[0])
+            root.right = TreeNode(right[0])
+
+        return root                     # Returning the subtree
+
+    def buildTree(self, p: List[int], i: List[int]) -> Optional[TreeNode]:
+
+        self.p = p
+        root = self.p[0]
+        pos = i.index(root)
+        left = i[ :pos]
+        right = i[pos+1: ]
+
+        return self.subtree(left, right)
+        
