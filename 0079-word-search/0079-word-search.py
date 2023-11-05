@@ -1,30 +1,42 @@
 class Solution(object):
-    def exist(self, board, word):
-        
-        self.word = word
-        self.found = False
-        for row in range(len(board)):
-            for col in range(len(board[0])):
-                self.visited = []
-                self.visitedSet = set()
-                self.dfs(board,row,col,0)
-                if self.found:
-                    return True
-        return False
+		def exist(self, board: List[List[str]], word: str) -> bool:
 
-    
-    def dfs(self,board,row,col,i):
+			R = len(board)
+			C = len(board[0])
 
-        if i == len(self.word):
-            self.found = True
+			if len(word) > R*C:
+					return False
 
-        if not self.found and row >= 0 and col >= 0 and row<len(board) and col<len(board[0]) and board[row][col] == self.word[i] and (row,col) not in self.visitedSet:
-            self.visited += [(row,col)]
-            self.visitedSet.add((row,col))
-            self.dfs(board,row+1,col,i+1)
-            self.dfs(board,row-1,col,i+1)
-            self.dfs(board,row,col+1,i+1)
-            self.dfs(board,row,col-1,i+1)
-        
-            if not self.found:
-                self.visitedSet.remove(self.visited.pop())
+			count = Counter(sum(board, []))
+
+			for c, countWord in Counter(word).items():
+				if count[c] < countWord:
+					return False
+
+			if count[word[0]] > count[word[-1]]:
+				word = word[::-1]
+
+			seen = set()
+
+			def dfs(r, c, i):
+				if i == len(word):
+					return True
+				if r < 0 or c < 0 or r >= R or c>=C or word[i] != board[r][c] or (r, c) in seen:
+					return False
+
+				seen.add((r,c))
+				res = (
+					dfs(r+1, c, i+1) or
+					dfs(r-1, c, i+1) or
+					dfs(r, c+1, i+1) or
+					dfs(r, c-1, i+1)
+				)
+				seen.remove((r, c))		# Backtracking
+
+				return res
+			
+			for i in range(R):
+				for j in range(C):
+					if dfs(i, j, 0):
+						return True
+			return False
