@@ -1,29 +1,34 @@
-# Time Complexity: O(n)
-# Space Complexity: O(n)
-'''
-The problem is to find the minimum hei. ht trees and return their root labels.
-'''
-class Solution(object):
-    def findMinHeightTrees(self, n, edges):
-        """
-        :type n: int
-        :type edges: List[List[int]]
-        :rtype: List[int]
-        """
-        if n == 1: return [0]
-        adj = [set() for _ in xrange(n)]
-        for i, j in edges:
-            adj[i].add(j)
-            adj[j].add(i)
+class Solution:
+    def findMinHeightTrees(self, n: int, edges: List[List[int]]) -> List[int]:
+        # Edge case: n = 1, return [0]
+        if n == 1:
+            return [0]
 
-        leaves = [i for i in xrange(n) if len(adj[i]) == 1]
+        # Build adjacency list for the graph
+        adj_list = {i: set() for i in range(n)}
+        for u, v in edges:
+            adj_list[u].add(v)
+            adj_list[v].add(u)
 
+        # Find all leaf nofes(i.e., nodes with degree 1)
+        leaves = [i for i in range(n) if len(adj_list[i]) == 1]
+
+        # Repeat until we are left with 1 or 2 nodes
         while n > 2:
+
+            # Remove the current leaf nodes along with their edges
             n -= len(leaves)
-            newLeaves = []
-            for i in leaves:
-                j = adj[i].pop()
-                adj[j].remove(i)
-                if len(adj[j]) == 1: newLeaves.append(j)
-            leaves = newLeaves
+            new_leaves = []
+            for leaf in leaves:
+                neighbor = adj_list[leaf].pop()
+                adj_list[neighbor].remove(leaf)
+
+                # If the neighnor becomes a new lead node, add it to the list
+                if len(adj_list[neighbor]) == 1:
+                    new_leaves.append(neighbor)
+
+            # Update the list of leaf nodes
+            leaves = new_leaves
+
+        # The remaining nodes are the roots of the MHTs
         return leaves
