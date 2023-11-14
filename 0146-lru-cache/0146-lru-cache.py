@@ -1,50 +1,75 @@
-# Tuesday November 14, 2023
+# Time complexity: O(1)
+# Space complexity: O(n)
 class Node:
     def __init__(self, key, val):
         self.key = key
         self.val = val
-        self.prev = None
         self.next = None
+        self.prev = None
 
-class LRUCache:
+class LRUCache(object):
 
-    def __init__(self, capacity: int):
-        self.cap = capacity
-        self.cache = {}
-
-        self.oldest = Node(0, 0)
-        self.latest = Node(0, 0)
-        self.oldest.next = self.latest
-        self.latest.prev = self.oldest
-
-    def get(self, key: int) -> int:
-        if key in self.cache:
-            self.remove(self.cache[key])
-            self.insert(self.cache[key])
-            return self.cache[key].val
-        return -1
-
-    def remove(self, node):
-        prev, next = node.prev, node.next
-        prev.next = next
-        next.prev = prev
+    def __init__(self, capacity):
+        """
+        :type capacity: int
+        """
+        self.size = capacity
+        self.m = {}
+        self.head = Node(-1, -1)
+        self.tail = Node(-1, -1)
+        self.head.next = self.tail
+        self.tail.prev = self.head
     
-    def insert(self, node):
-        prev, next = self.latest.prev, self.latest
-        prev.next = next.prev = node
-        node.next = next
-        node.prev = prev
+    def deleteNode(self, p):
+        p.prev.next = p.next
+        p.next.prev = p.prev
 
-    def put(self, key: int, value: int) -> None:
-        if key in self.cache:
-            self.remove(self.cache[key])
-        self.cache[key] = Node(key, value)
-        self.insert(self.cache[key])
+    def addNode(self, newnode):
+        temp = self.head.next
+        self.head.next = newnode
+        newnode.prev = self.head
+        newnode.next = temp
+        temp.prev = newnode
 
-        if len(self.cache) > self.cap:
-            lru = self.oldest.next
-            self.remove(lru)
-            del self.cache[lru.key]
+    def get(self, key):
+        """
+        :type key: int
+        :rtype: int
+        """
+        if key not in self.m:
+            return -1
+        
+        p = self.m[key]
+        self.deleteNode(p)
+        self.addNode(p)
+        self.m[key] = self.head.next
+        return self.head.next.val        
+
+    def put(self, key, value):
+        """
+        :type key: int
+        :type value: int
+        :rtype: None
+        """
+        if key in self.m:
+            c = self.m[key]
+            self.deleteNode(c)
+            c.val = value
+            self.addNode(c)
+            self.m[key] = self.head.next
+        else:
+            if len(self.m) == self.size:
+                prev = self.tail.prev
+                self.deleteNode(prev)
+                l = Node(key, value)
+                self.addNode(l)
+                del self.m[prev.key]
+                self.m[key] = self.head.next
+            else:
+                l = Node(key, value)
+                self.addNode(l)
+                self.m[key] = self.head.next
+        
 
 
 # Your LRUCache object will be instantiated and called as such:
