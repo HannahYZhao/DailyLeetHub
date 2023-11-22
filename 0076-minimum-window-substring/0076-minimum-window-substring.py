@@ -1,30 +1,28 @@
-class Solution(object):
-    def minWindow(self, s, t):
+class Solution:
+    def minWindow(self, s: str, t: str) -> str:
         if len(s) < len(t):
             return ""
-        map = {}
-        for char in t:
-            if char in map:
-                map[char] += 1
-            else:
-                map[char] = 1
-        count = 0
+        needstr = collections.defaultdict(int)
+        for ch in t:
+            needstr[ch] += 1
+        needcnt = len(t)
+        res = (0, float('inf'))
         start = 0
-        min_length = float("inf")
-        min_start = 0
-        for end in range(len(s)):
-            if s[end] in map:
-                map[s[end]] -= 1
-                if map[s[end]] >= 0:
-                    count += 1
-            while count == len(t):
-                if min_length > end - start + 1:
-                    min_length = end - start + 1
-                    min_start = start
-                if s[start] in map:
-                    map[s[start]] += 1
-                    if map[s[start]] > 0:
-                        count -= 1
+        for end, ch in enumerate(s):
+            if needstr[ch] > 0:
+                needcnt -= 1
+            needstr[ch] -= 1
+            if needcnt == 0:
+                while True:
+                    tmp = s[start]
+                    if needstr[tmp] == 0:
+                        break
+                    needstr[tmp] += 1
+                    start += 1
+                if end - start < res[1] - res[0]:
+                    res = (start, end)
+                needstr[s[start]] += 1
+                needcnt += 1
                 start += 1
-        return "" if min_length == float("inf") else s[min_start:min_start+min_length]
-                
+        
+        return '' if res[1] > len(s) else s[res[0]:res[1]+1]
