@@ -1,14 +1,15 @@
-class Solution:
-    def dailyTemperatures(self, T: List[int]) -> List[int]:
-        n, right_max = len(T), float('-inf')
-        res = [0] * n
-        for i in range(n-1, -1, -1):
-            t = T[i]
-            if right_max <= t:
-                right_max = t
-            else:
-                days = 1
-                while T[i+days] <= t:
-                    days += res[i+days]
-                res[i] = days
-        return res
+class Solution(object):
+    def dailyTemperatures(self, T):
+        """
+        :type temperatures: List[int]
+        :rtype: List[int]
+        """
+        ans = [0] * len(T)
+        stack = []
+        for i, t in enumerate(T):
+            while stack and T[stack[-1]] < t:
+                cur = stack.pop()
+                ans[cur] = i - cur
+            stack.append(i)
+        
+        return ans
