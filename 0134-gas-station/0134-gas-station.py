@@ -1,20 +1,25 @@
-# Time Complexity: O(N)
-# Space Complexity: O(1)
-
-class Solution(object):
+class Solution:
     def canCompleteCircuit(self, gas, cost):
-        """
-        :type gas: List[int]
-        :type cost: List[int]
-        :rtype: int
-        """
-        n, total_surplus, surplus, start = len(gas), 0, 0, 0
-        
+        n = len(gas)
+        total_gas = 0
+        total_cost = 0
+        curr_gas = 0
+        starting_point = 0
+
         for i in range(n):
-            total_surplus += gas[i] - cost[i]
-            surplus += gas[i] - cost[i]
-            if surplus < 0:
-                surplus = 0
-                start = i + 1
+            # These two variables are to check if no case is possible
+            total_gas += gas[i]
+            total_cost += cost[i]
+            # For checking the total present gas at index i
+            curr_gas += gas[i] - cost[i]
+
+            if curr_gas < 0:
+                # There is a breakdown, so we will start from the next point or index
+                starting_point = i + 1
+                # Reset our fuel
+                curr_gas = 0
+
+        return -1 if total_gas < total_cost else starting_point
+
         
-        return -1 if (total_surplus < 0) else start
+        
